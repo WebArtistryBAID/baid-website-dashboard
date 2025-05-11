@@ -12,7 +12,7 @@ export default async function Home() {
     const { t } = await useTranslation('home')
     const user = await me()
     if (user === null) {
-        redirect('/admin/login/?next=/') // Redirects to Wagtail for authentication
+        redirect('/auth/login/onelogin/?next=/') // Redirects to Wagtail for authentication
     }
     return <main>
         <h1 className="mb-5 text-4xl font-bold">{t('welcome', { name: user })}</h1>
