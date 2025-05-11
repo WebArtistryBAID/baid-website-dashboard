@@ -2,17 +2,10 @@
 
 import { cookies } from 'next/headers'
 
-export async function getWagtailPath(): Promise<string> {
-    if (process.env.WAGTAIL_PATH!.startsWith('/')) {
-        return process.env.HOSTED! + process.env.WAGTAIL_PATH!
-    }
-    return process.env.WAGTAIL_PATH!
-}
-
 export async function me(): Promise<string | null> {
-    //if (process.env.WAGTAIL_PATH!.includes('localhost')) {
-    //    return 'Test User'
-    //}
+    if (process.env.WAGTAIL_AUTH_PATH === 'dev') {
+        return 'Test User'
+    }
 
     const jar = await cookies()
     if (!jar.has('sessionid')) {
@@ -20,7 +13,7 @@ export async function me(): Promise<string | null> {
     }
 
     // We're doing some stupid HTML parsing
-    const res = await fetch(await getWagtailPath(), {
+    const res = await fetch(process.env.WAGTAIL_AUTH_PATH!, {
         method: 'GET',
         headers: {
             Cookie: `sessionid=${jar.get('sessionid')?.value}`

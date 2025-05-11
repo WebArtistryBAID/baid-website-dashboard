@@ -1,5 +1,5 @@
 import { useTranslation } from '@/app/i18n'
-import { getWagtailPath, me } from '@/app/lib/utils'
+import { me } from '@/app/lib/utils'
 import { redirect } from 'next/navigation'
 import { getLatestBuilds } from '@/app/lib/build-actions'
 import { BuildStatus } from '@prisma/client'
@@ -21,7 +21,7 @@ export default async function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
             <a href={process.env.PREVIEW_URL} className="btn-secondary">{t('actions.prev')}</a>
             <a href={process.env.PROD_URL} className="btn-secondary">{t('actions.prod')}</a>
-            <a href={await getWagtailPath()} className="btn-secondary">{t('actions.wagtail')}</a>
+            <a href={process.env.WAGTAIL_URL} className="btn-secondary">{t('actions.wagtail')}</a>
             <BuildButton/>
         </div>
 
