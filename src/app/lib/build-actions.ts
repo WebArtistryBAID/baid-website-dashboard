@@ -4,6 +4,7 @@ import { me } from '@/app/lib/utils'
 import { AuditLogType, Build, BuildStatus, PrismaClient } from '@prisma/client'
 import * as fs from 'fs/promises'
 import { spawn } from 'child_process'
+import * as path from 'path'
 
 function runCommand(
     command: string,
@@ -128,6 +129,17 @@ async function workOnBuild(build: Build): Promise<void> {
                 status: BuildStatus.inactive
             }
         })
+
+        // Prune older builds, keep only the latest ten
+        const buildsDir = path.resolve(__dirname, '../dashboard-artifacts/builds')
+        const allEntries = await fs.readdir(buildsDir)
+        const buildDirs = allEntries
+            .filter(name => /^\d+$/.test(name))
+            .sort((a, b) => parseInt(b) - parseInt(a))
+        const toDelete = buildDirs.slice(10)
+        for (const dir of toDelete) {
+            await fs.rm(path.join(buildsDir, dir), { recursive: true, force: true })
+        }
     } catch {
         await prisma.build.update({
             where: {
