@@ -1,0 +1,27 @@
+{
+  "welcome": "Welcome, {{name}}!",
+  "actions": {
+    "title": "Actions",
+    "build": "Build",
+    "prod": "Production Website",
+    "prev": "Preview Website",
+    "wagtail": "Wagtail CMS"
+  },
+  "builds": {
+    "title": "Latest Builds",
+    "user": "User",
+    "message": "Message",
+    "status": "Status",
+    "time": "Time",
+    "actions": "Actions",
+    "preview": "Deploy to Preview",
+    "prod": "Deploy to Production"
+  },
+  "status": {
+    "working": "Working",
+    "inactive": "Ready",
+    "activePreview": "In Preview",
+    "activeProduction": "In Production",
+    "error": "Error"
+  }
+}

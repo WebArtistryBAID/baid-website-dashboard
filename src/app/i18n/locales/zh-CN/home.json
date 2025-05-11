@@ -1,0 +1,14 @@
+{
+  "nav": {
+    "home": "主页",
+    "applications": "应用",
+    "developers": "开发者",
+    "authorizations": "已授权应用",
+    "organizations": "组织",
+    "approval": "审批",
+    "logout": "退出登录"
+  },
+  "welcome": "欢迎回来，{{name}}!",
+  "seiue": "希悦校园",
+  "wait": "请稍等..."
+}
