@@ -3,7 +3,18 @@
 import { me } from '@/app/lib/utils'
 import { AuditLogType, Build, BuildStatus, PrismaClient } from '@prisma/client'
 import * as fs from 'fs/promises'
-import { exec } from 'promisify-child-process'
+import { spawn } from 'child_process'
+
+function runCommand(command: string, args: string[], cwd?: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        console.log(`+ Running command: ${command} ${args.join(' ')}`)
+        const child = spawn(command, args, { cwd, stdio: 'inherit', shell: true })
+        child.on('close', code => {
+            if (code === 0) resolve()
+            else reject(new Error(`+ ${command} exited with code ${code}`))
+        })
+    })
+}
 
 const prisma = new PrismaClient()
 
@@ -57,13 +68,14 @@ async function exists(path: string): Promise<boolean> {
 
 async function workOnBuild(build: Build): Promise<void> {
     try {
+        console.log(`+ Starting build process for ${build.id}`)
         if (await exists('working/repo')) {
-            await exec('git pull', { cwd: 'working/repo' })
+            await runCommand('git', [ 'pull' ], 'working/repo')
         } else {
-            await exec(`git clone ${process.env.WEBSITE_REPO} working/repo --depth=1`)
+            await runCommand('git', [ 'clone', process.env.WEBSITE_REPO!, 'working/repo', '--depth=1' ])
         }
-        await exec('npm install', { cwd: 'working/repo' })
-        await exec('npm run build', { cwd: 'working/repo' })
+        await runCommand('npm', [ 'install' ], 'working/repo')
+        await runCommand('npm', [ 'run', 'build' ], 'working/repo')
 
         if (!await exists('working/repo/dist')) {
             throw new Error('Build failed')
