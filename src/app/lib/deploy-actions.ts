@@ -4,6 +4,29 @@ import { me } from '@/app/lib/utils'
 import { AuditLogType, BuildStatus, PrismaClient } from '@prisma/client'
 import * as fs from 'fs/promises'
 import * as path from 'path'
+import { spawn } from 'child_process'
+
+function runCommand(
+    command: string,
+    args: string[],
+    cwd?: string,
+    envVars?: NodeJS.ProcessEnv
+): Promise<void> {
+    return new Promise((resolve, reject) => {
+        console.log(`+ Running command: ${command} ${args.join(' ')}`)
+        const options = {
+            cwd,
+            stdio: 'inherit' as const,
+            shell: true,
+            env: { ...process.env, ...envVars }
+        }
+        const child = spawn(command, args, options)
+        child.on('close', code => {
+            if (code === 0) resolve()
+            else reject(new Error(`+ ${command} exited with code ${code}`))
+        })
+    })
+}
 
 const prisma = new PrismaClient()
 
@@ -23,16 +46,24 @@ export async function deployPreview(build: number): Promise<void> {
 
     try {
         const buildPath = `../dashboard-artifacts/builds/${build}`
-        const previewPath = process.env.PREVIEW_PATH!
+        if (process.env.DEPLOY_MODE === 'local') {
+            const previewPath = process.env.PREVIEW_PATH!
 
-        // Remove all contents inside previewPath
-        const previewEntries = await fs.readdir(previewPath)
-        await Promise.all(
-            previewEntries.map(entry =>
-                fs.rm(path.join(previewPath, entry), { recursive: true, force: true })
+            // Remove all contents inside previewPath
+            const previewEntries = await fs.readdir(previewPath)
+            await Promise.all(
+                previewEntries.map(entry =>
+                    fs.rm(path.join(previewPath, entry), { recursive: true, force: true })
+                )
             )
-        )
-        await fs.cp(buildPath, previewPath, { recursive: true })
+            await fs.cp(buildPath, previewPath, { recursive: true })
+        } else if (process.env.DEPLOY_MODE === 'cloudflare') {
+            await runCommand('npx', [ 'wrangler', 'pages', 'deploy', buildPath, '--project-name', process.env.PREVIEW_PROJECT! ], '.', {
+                NODE_ENV: process.env.NODE_ENV,
+                CLOUDFLARE_ACCOUNT_ID: process.env.CF_ACCOUNT_ID!,
+                CLOUDFLARE_API_TOKEN: process.env.CF_API_TOKEN!
+            })
+        }
     } catch (e) {
         console.error(`While deploying preview for ${build}: ${e}`)
         await prisma.build.update({
@@ -88,17 +119,25 @@ export async function deployProduction(build: number, password: string): Promise
 
     try {
         const buildPath = `../dashboard-artifacts/builds/${build}`
-        const prodPath = process.env.PROD_PATH!
+        if (process.env.DEPLOY_MODE === 'local') {
+            const prodPath = process.env.PROD_PATH!
 
-        // Remove all contents inside prodPath
-        const prodEntries = await fs.readdir(prodPath)
-        await Promise.all(
-            prodEntries.map(entry =>
-                fs.rm(path.join(prodPath, entry), { recursive: true, force: true })
+            // Remove all contents inside prodPath
+            const prodEntries = await fs.readdir(prodPath)
+            await Promise.all(
+                prodEntries.map(entry =>
+                    fs.rm(path.join(prodPath, entry), { recursive: true, force: true })
+                )
             )
-        )
 
-        await fs.cp(buildPath, prodPath, { recursive: true })
+            await fs.cp(buildPath, prodPath, { recursive: true })
+        } else if (process.env.DEPLOY_MODE === 'cloudflare') {
+            await runCommand('npx', [ 'wrangler', 'pages', 'deploy', buildPath, '--project-name', process.env.PROD_PROJECT! ], '.', {
+                NODE_ENV: process.env.NODE_ENV,
+                CLOUDFLARE_ACCOUNT_ID: process.env.CF_ACCOUNT_ID!,
+                CLOUDFLARE_API_TOKEN: process.env.CF_API_TOKEN!
+            })
+        }
     } catch (e) {
         console.error(`While deploying production for ${build}: ${e}`)
         await prisma.build.update({
