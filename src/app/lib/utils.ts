@@ -10,9 +10,9 @@ export async function getWagtailPath(): Promise<string> {
 }
 
 export async function me(): Promise<string | null> {
-    if (process.env.WAGTAIL_PATH!.includes('localhost')) {
-        return 'Test User'
-    }
+    //if (process.env.WAGTAIL_PATH!.includes('localhost')) {
+    //    return 'Test User'
+    //}
 
     const jar = await cookies()
     if (!jar.has('sessionid')) {
