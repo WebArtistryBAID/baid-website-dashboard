@@ -5,7 +5,6 @@ import { Inter, Noto_Sans_SC } from 'next/font/google'
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import NextTopLoader from 'nextjs-toploader'
-import If from '@/app/lib/If'
 
 config.autoAddCss = false
 

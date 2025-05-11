@@ -24,10 +24,17 @@
     "inactive": "准备就绪",
     "activePreview": "已部署至预览",
     "activeProduction": "已部署至生产",
+    "activeBoth": "已部署至预览 / 生产",
     "error": "错误"
   },
   "build": {
     "inputLabel": "更改构建说明",
     "inputPlaceholder": "描述您的更改..."
+  },
+  "deploy": {
+    "previewMessage": "本次构建将可用于预览。",
+    "prodMessage": "本次构建将立即用于生产。",
+    "inputPlaceholder": "部署密码...",
+    "inputError": "部署失败。请检查您的密码。"
   }
 }

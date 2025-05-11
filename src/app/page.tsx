@@ -5,6 +5,8 @@ import { getLatestBuilds } from '@/app/lib/build-actions'
 import { BuildStatus } from '@prisma/client'
 import If from '@/app/lib/If'
 import BuildButton from '@/app/components/BuildButton'
+import DeployPreviewButton from '@/app/components/DeployPreviewButton'
+import DeployProductionButton from '@/app/components/DeployProductionButton'
 
 export default async function Home() {
     const { t } = await useTranslation('home')
@@ -54,8 +56,8 @@ export default async function Home() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             <If condition={b.status !== BuildStatus.working && b.status !== BuildStatus.error}>
                                 <div className="flex gap-3 flex-wrap">
-                                    <button className="btn-secondary text-sm">{t('builds.preview')}</button>
-                                    <button className="btn-danger text-sm">{t('builds.prod')}</button>
+                                    <DeployPreviewButton build={b.id}/>
+                                    <DeployProductionButton build={b.id}/>
                                 </div>
                             </If>
                         </td>

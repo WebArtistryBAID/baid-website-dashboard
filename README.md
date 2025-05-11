@@ -22,6 +22,8 @@ To run in development:
 | `WAGTAIL_PATH`    | The path to the Wagtail instance admin panel. No trailing slashes. |
 | `PREVIEW_URL`     | The URL to the preview server.                                     |
 | `PROD_URL`        | The URL to the production server.                                  |
+| `PREVIEW_PATH`    | The path to the preview server. No trailing slashes.               |
+| `PROD_PATH`       | The path to the production server. No trailing slashes.            |
 | `WEBSITE_REPO`    | The URL of the website repository.                                 |
 
 * Run `npm run dev`.

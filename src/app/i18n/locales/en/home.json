@@ -24,10 +24,17 @@
     "inactive": "Ready",
     "activePreview": "In Preview",
     "activeProduction": "In Production",
+    "activeBoth": "In Preview / Production",
     "error": "Error"
   },
   "build": {
     "inputLabel": "Change description",
     "inputPlaceholder": "Describe your changes..."
+  },
+  "deploy": {
+    "previewMessage": "This build will be made available for preview.",
+    "prodMessage": "This build will be immediately made available for production.",
+    "inputPlaceholder": "Deployment password...",
+    "inputError": "Deployment failed. Please check your password."
   }
 }

@@ -39,5 +39,6 @@ enum BuildStatus {
   inactive
   activePreview
   activeProduction
+  activeBoth
   error
 }
