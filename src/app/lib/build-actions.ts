@@ -92,7 +92,7 @@ async function workOnBuild(build: Build): Promise<void> {
                     ALL_PROXY: process.env.PROXY
                 })
         }
-        await runCommand('npm', [ 'install' ], '../dashboard-artifacts/repo', {
+        await runCommand('npm', [ 'ci' ], '../dashboard-artifacts/repo', {
             NODE_ENV: process.env.NODE_ENV,
             ALL_PROXY: process.env.PROXY
         })
