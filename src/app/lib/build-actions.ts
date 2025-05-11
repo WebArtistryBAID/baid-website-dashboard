@@ -57,24 +57,24 @@ async function exists(path: string): Promise<boolean> {
 
 async function workOnBuild(build: Build): Promise<void> {
     try {
-        if (await exists('repo')) {
-            await exec('git pull', { cwd: 'repo' })
+        if (await exists('working/repo')) {
+            await exec('git pull', { cwd: 'working/repo' })
         } else {
-            await exec(`git clone ${process.env.WEBSITE_REPO} repo`)
+            await exec(`git clone ${process.env.WEBSITE_REPO} working/repo --depth=1`)
         }
-        await exec('npm install', { cwd: 'repo' })
-        await exec('npm run build', { cwd: 'repo' })
+        await exec('npm install', { cwd: 'working/repo' })
+        await exec('npm run build', { cwd: 'working/repo' })
 
-        if (!await exists('repo/dist')) {
+        if (!await exists('working/repo/dist')) {
             throw new Error('Build failed')
         }
 
-        if (!await exists('builds')) {
-            await fs.mkdir('builds')
+        if (!await exists('working/builds')) {
+            await fs.mkdir('working/builds')
         }
 
-        await fs.mkdir(`builds/${build.id}`)
-        await fs.cp('repo/dist/', `builds/${build.id}/`, {
+        await fs.mkdir(`working/builds/${build.id}`)
+        await fs.cp('working/repo/dist/', `working/builds/${build.id}/`, {
             recursive: true,
             force: true
         })

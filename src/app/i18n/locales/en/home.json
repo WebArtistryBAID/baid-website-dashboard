@@ -1,5 +1,7 @@
 {
   "welcome": "Welcome, {{name}}!",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
   "actions": {
     "title": "Actions",
     "build": "Build",
@@ -23,5 +25,9 @@
     "activePreview": "In Preview",
     "activeProduction": "In Production",
     "error": "Error"
+  },
+  "build": {
+    "inputLabel": "Change description",
+    "inputPlaceholder": "Describe your changes..."
   }
 }

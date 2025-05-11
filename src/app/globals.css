@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 main {
-    @apply sm:max-w-[77rem] sm:mx-auto mx-5 my-16;
+    @apply sm:max-w-[77rem] sm:mx-auto px-5 my-16;
 }
 
 .icon-btn {

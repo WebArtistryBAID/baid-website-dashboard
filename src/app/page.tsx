@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { getLatestBuilds } from '@/app/lib/build-actions'
 import { BuildStatus } from '@prisma/client'
 import If from '@/app/lib/If'
+import BuildButton from '@/app/components/BuildButton'
 
 export default async function Home() {
     const { t } = await useTranslation('home')
@@ -19,7 +20,7 @@ export default async function Home() {
             <a href={process.env.PREVIEW_URL} className="btn-secondary">{t('actions.prev')}</a>
             <a href={process.env.PROD_URL} className="btn-secondary">{t('actions.prod')}</a>
             <a href={await getWagtailPath()} className="btn-secondary">{t('actions.wagtail')}</a>
-            <button className="text-left btn">{t('actions.build')}</button>
+            <BuildButton/>
         </div>
 
         <h2 className="text-xl mb-3">{t('builds.title')}</h2>

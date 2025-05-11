@@ -1,14 +1,33 @@
 {
-  "nav": {
-    "home": "主页",
-    "applications": "应用",
-    "developers": "开发者",
-    "authorizations": "已授权应用",
-    "organizations": "组织",
-    "approval": "审批",
-    "logout": "退出登录"
+  "welcome": "欢迎， {{name}}!",
+  "cancel": "取消",
+  "confirm": "确认",
+  "actions": {
+    "title": "操作",
+    "build": "构建",
+    "prod": "生产网站",
+    "prev": "预览网站",
+    "wagtail": "内容管理系统"
   },
-  "welcome": "欢迎回来，{{name}}!",
-  "seiue": "希悦校园",
-  "wait": "请稍等..."
+  "builds": {
+    "title": "最新构建",
+    "user": "用户",
+    "message": "说明",
+    "status": "状态",
+    "time": "时间",
+    "actions": "操作",
+    "preview": "部署至预览",
+    "prod": "部署至生产"
+  },
+  "status": {
+    "working": "构建中",
+    "inactive": "准备就绪",
+    "activePreview": "已部署至预览",
+    "activeProduction": "已部署至生产",
+    "error": "错误"
+  },
+  "build": {
+    "inputLabel": "更改构建说明",
+    "inputPlaceholder": "描述您的更改..."
+  }
 }
