@@ -21,7 +21,7 @@ export async function deployPreview(build: number): Promise<void> {
     })
 
     try {
-        const buildPath = `working/builds/${build}`
+        const buildPath = `../dashboard-artifacts/builds/${build}`
         const previewPath = process.env.PREVIEW_PATH!
         await fs.rm(previewPath, { recursive: true, force: true })
         await fs.mkdir(previewPath, { recursive: true })
@@ -80,7 +80,7 @@ export async function deployProduction(build: number, password: string): Promise
     })
 
     try {
-        const buildPath = `working/builds/${build}`
+        const buildPath = `../dashboard-artifacts/builds/${build}`
         const prodPath = process.env.PROD_PATH!
         await fs.rm(prodPath, { recursive: true, force: true })
         await fs.mkdir(prodPath, { recursive: true })

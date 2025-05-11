@@ -26,6 +26,7 @@ To run in development:
 | `PREVIEW_PATH`      | The path to the preview server. No trailing slashes.         |
 | `PROD_PATH`         | The path to the production server. No trailing slashes.      |
 | `WEBSITE_REPO`      | The URL of the website repository.                           |
+| `PROXY`             | Proxy, if required to connect to internet.                   |
 
 * Run `npm run dev`.
 

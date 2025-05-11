@@ -5,10 +5,21 @@ import { AuditLogType, Build, BuildStatus, PrismaClient } from '@prisma/client'
 import * as fs from 'fs/promises'
 import { spawn } from 'child_process'
 
-function runCommand(command: string, args: string[], cwd?: string): Promise<void> {
+function runCommand(
+    command: string,
+    args: string[],
+    cwd?: string,
+    envVars?: NodeJS.ProcessEnv
+): Promise<void> {
     return new Promise((resolve, reject) => {
         console.log(`+ Running command: ${command} ${args.join(' ')}`)
-        const child = spawn(command, args, { cwd, stdio: 'inherit', shell: true })
+        const options = {
+            cwd,
+            stdio: 'inherit' as const,
+            shell: true,
+            env: { ...process.env, ...envVars }
+        }
+        const child = spawn(command, args, options)
         child.on('close', code => {
             if (code === 0) resolve()
             else reject(new Error(`+ ${command} exited with code ${code}`))
@@ -69,24 +80,37 @@ async function exists(path: string): Promise<boolean> {
 async function workOnBuild(build: Build): Promise<void> {
     try {
         console.log(`+ Starting build process for ${build.id}`)
-        if (await exists('working/repo')) {
-            await runCommand('git', [ 'pull' ], 'working/repo')
+        if (await exists('../dashboard-artifacts/repo')) {
+            await runCommand('git', [ 'pull' ], '../dashboard-artifacts/repo', {
+                NODE_ENV: process.env.NODE_ENV,
+                ALL_PROXY: process.env.PROXY
+            })
         } else {
-            await runCommand('git', [ 'clone', process.env.WEBSITE_REPO!, 'working/repo', '--depth=1' ])
+            await runCommand('git', [ 'clone', process.env.WEBSITE_REPO!, '../dashboard-artifacts/repo', '--depth=1' ],
+                '.', {
+                    NODE_ENV: process.env.NODE_ENV,
+                    ALL_PROXY: process.env.PROXY
+                })
         }
-        await runCommand('npm', [ 'install' ], 'working/repo')
-        await runCommand('npm', [ 'run', 'build' ], 'working/repo')
+        await runCommand('npm', [ 'install' ], '../dashboard-artifacts/repo', {
+            NODE_ENV: process.env.NODE_ENV,
+            ALL_PROXY: process.env.PROXY
+        })
+        await runCommand('npm', [ 'run', 'build' ], '../dashboard-artifacts/repo', {
+            NODE_ENV: process.env.NODE_ENV,
+            ALL_PROXY: process.env.PROXY
+        })
 
-        if (!await exists('working/repo/dist')) {
+        if (!await exists('../dashboard-artifacts/repo/dist')) {
             throw new Error('Build failed')
         }
 
-        if (!await exists('working/builds')) {
-            await fs.mkdir('working/builds')
+        if (!await exists('../dashboard-artifacts/builds')) {
+            await fs.mkdir('../dashboard-artifacts/builds')
         }
 
-        await fs.mkdir(`working/builds/${build.id}`)
-        await fs.cp('working/repo/dist/', `working/builds/${build.id}/`, {
+        await fs.mkdir(`../dashboard-artifacts/builds/${build.id}`)
+        await fs.cp('../dashboard-artifacts/repo/dist/', `../dashboard-artifacts/builds/${build.id}/`, {
             recursive: true,
             force: true
         })
