@@ -96,7 +96,12 @@ async function workOnBuild(build: Build): Promise<void> {
             NODE_ENV: process.env.NODE_ENV,
             ALL_PROXY: process.env.PROXY
         })
-        await runCommand('npm', [ 'run', 'build' ], '../dashboard-artifacts/repo', {
+        await runCommand('node', [ './scripts/pre.ts' ], '../dashboard-artifacts/repo', {
+            NODE_ENV: process.env.NODE_ENV,
+            ALL_PROXY: process.env.PROXY,
+            WAGTAIL_BASE: process.env.WAGTAIL_AUTH_PATH!
+        })
+        await runCommand('./node_modules/.bin/vite', [ 'build' ], '../dashboard-artifacts/repo', {
             NODE_ENV: process.env.NODE_ENV,
             ALL_PROXY: process.env.PROXY
         })
