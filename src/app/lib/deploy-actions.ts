@@ -3,6 +3,7 @@
 import { me } from '@/app/lib/utils'
 import { AuditLogType, BuildStatus, PrismaClient } from '@prisma/client'
 import * as fs from 'fs/promises'
+import * as path from 'path'
 
 const prisma = new PrismaClient()
 
@@ -23,8 +24,14 @@ export async function deployPreview(build: number): Promise<void> {
     try {
         const buildPath = `../dashboard-artifacts/builds/${build}`
         const previewPath = process.env.PREVIEW_PATH!
-        await fs.rm(previewPath, { recursive: true, force: true })
-        await fs.mkdir(previewPath, { recursive: true })
+
+        // Remove all contents inside previewPath
+        const previewEntries = await fs.readdir(previewPath)
+        await Promise.all(
+            previewEntries.map(entry =>
+                fs.rm(path.join(previewPath, entry), { recursive: true, force: true })
+            )
+        )
         await fs.cp(buildPath, previewPath, { recursive: true })
     } catch (e) {
         console.error(`While deploying preview for ${build}: ${e}`)
@@ -82,8 +89,15 @@ export async function deployProduction(build: number, password: string): Promise
     try {
         const buildPath = `../dashboard-artifacts/builds/${build}`
         const prodPath = process.env.PROD_PATH!
-        await fs.rm(prodPath, { recursive: true, force: true })
-        await fs.mkdir(prodPath, { recursive: true })
+
+        // Remove all contents inside prodPath
+        const prodEntries = await fs.readdir(prodPath)
+        await Promise.all(
+            prodEntries.map(entry =>
+                fs.rm(path.join(prodPath, entry), { recursive: true, force: true })
+            )
+        )
+
         await fs.cp(buildPath, prodPath, { recursive: true })
     } catch (e) {
         console.error(`While deploying production for ${build}: ${e}`)
