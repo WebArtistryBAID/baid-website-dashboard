@@ -36,9 +36,6 @@ export async function getLatestBuilds(): Promise<Build[]> {
         return []
     }
     return prisma.build.findMany({
-        where: {
-            user
-        },
         orderBy: {
             createdAt: 'desc'
         },
