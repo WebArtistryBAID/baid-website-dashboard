@@ -137,7 +137,8 @@ async function workOnBuild(build: Build): Promise<void> {
         for (const dir of toDelete) {
             await fs.rm(path.join(buildsDir, dir), { recursive: true, force: true })
         }
-    } catch {
+    } catch (e) {
+        console.error(`+ Build ${build.id} failed with ${e}`)
         await prisma.build.update({
             where: {
                 id: build.id
