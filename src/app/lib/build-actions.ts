@@ -128,14 +128,13 @@ async function workOnBuild(build: Build): Promise<void> {
         })
 
         // Prune older builds, keep only the latest ten
-        const buildsDir = path.resolve(__dirname, '../dashboard-artifacts/builds')
-        const allEntries = await fs.readdir(buildsDir)
+        const allEntries = await fs.readdir('../dashboard-artifacts/builds')
         const buildDirs = allEntries
             .filter(name => /^\d+$/.test(name))
             .sort((a, b) => parseInt(b) - parseInt(a))
         const toDelete = buildDirs.slice(10)
         for (const dir of toDelete) {
-            await fs.rm(path.join(buildsDir, dir), { recursive: true, force: true })
+            await fs.rm(path.join('../dashboard-artifacts/builds', dir), { recursive: true, force: true })
         }
     } catch (e) {
         console.error(`+ Build ${build.id} failed with ${e}`)
