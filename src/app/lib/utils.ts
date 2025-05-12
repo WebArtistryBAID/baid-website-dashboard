@@ -17,7 +17,8 @@ export async function me(): Promise<string | null> {
         method: 'GET',
         headers: {
             Cookie: `sessionid=${jar.get('sessionid')?.value}`
-        }
+        },
+        redirect: 'manual'
     })
 
     if (res.status !== 200) {
