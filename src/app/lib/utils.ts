@@ -13,7 +13,7 @@ export async function me(): Promise<string | null> {
     }
 
     // We're doing some stupid HTML parsing
-    const res = await fetch(process.env.WAGTAIL_AUTH_PATH! + '/admin', {
+    const res = await fetch(process.env.WAGTAIL_AUTH_PATH! + '/admin/', {
         method: 'GET',
         headers: {
             Cookie: `sessionid=${jar.get('sessionid')?.value}`
