@@ -94,6 +94,7 @@ async function workOnAddArticle(build: Build, link: string) {
         // STEP 2: Sanitize content
         console.log('+ Calling DeepSeek to sanitize article content.')
         const sanitizeResp = await fetch('https://api.deepseek.com/chat/completions', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`
@@ -120,6 +121,7 @@ async function workOnAddArticle(build: Build, link: string) {
         // STEP 3: Translate content
         console.log('+ Calling DeepSeek to translate article content.')
         const translateResp = await fetch('https://api.deepseek.com/chat/completions', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`
