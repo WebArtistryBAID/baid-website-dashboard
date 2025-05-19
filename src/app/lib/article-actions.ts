@@ -73,7 +73,7 @@ async function workOnAddArticle(build: Build, link: string) {
         console.log(`+ Starting article download for ${build.id} from ${link}.`)
         // STEP 0: Download the article
         await fs.mkdir(`/tmp/article-build-${build.id}`)
-        await runCommand('../blobs/downloader', [ link, `/tmp/article-build-${build.id}`, '--image=save' ], `/tmp/article-build-${build.id}`)
+        await runCommand(path.join(process.env.HOME!, 'blobs', 'downloader'), [ link, `/tmp/article-build-${build.id}`, '--image=save' ], `/tmp/article-build-${build.id}`)
 
         // Move from /tmp/article-build-${build.id}/(...) to /tmp/article-build-${build.id}/article
         const files = await fs.readdir(`/tmp/article-build-${build.id}`)

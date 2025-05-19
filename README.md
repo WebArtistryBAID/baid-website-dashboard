@@ -33,6 +33,7 @@ To run in development:
 | `WEBSITE_REPO`      | The URL of the website repository.                                             |
 | `PROXY`             | Proxy, if required to connect to internet.                                     |
 | `DEEPSEEK_API_KEY`  | Required for quick-add articles.                                               |
+| `HOME`              | Base directory of the dashboard.                                               |
 
 * Run `npm run dev`.
 
