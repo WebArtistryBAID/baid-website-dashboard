@@ -112,7 +112,9 @@ async function workOnAddArticle(build: Build, link: string) {
         })
         console.log('+ DeepSeek responded with sanitized content.')
         const srj = await sanitizeResp.json()
-        const sr = JSON.parse(srj.choices[0].message.content)
+        const srRawContent = srj.choices[0].message.content
+        const srStrippedContent = srRawContent.replace(/^```json\s*/, '').replace(/```$/, '')
+        const sr = JSON.parse(srStrippedContent)
 
         const titleChinese = sr.title
         const contentChinese = sr.content
@@ -140,7 +142,9 @@ async function workOnAddArticle(build: Build, link: string) {
         })
         console.log('+ DeepSeek responded with translated content.')
         const trj = await translateResp.json()
-        const tr = JSON.parse(trj.choices[0].message.content)
+        const trRawContent = trj.choices[0].message.content
+        const trStrippedContent = trRawContent.replace(/^```json\s*/, '').replace(/```$/, '')
+        const tr = JSON.parse(trStrippedContent)
 
         const title = tr.title
         const content = tr.content
