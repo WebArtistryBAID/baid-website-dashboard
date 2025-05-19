@@ -5,7 +5,7 @@
   "actions": {
     "title": "Actions",
     "build": "Build",
-    "article": "Add Article",
+    "addArticle": "Add Article",
     "prod": "Production Website",
     "prev": "Preview Website",
     "wagtail": "Wagtail CMS"

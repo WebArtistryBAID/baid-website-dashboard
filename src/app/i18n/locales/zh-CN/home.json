@@ -5,7 +5,7 @@
   "actions": {
     "title": "操作",
     "build": "构建",
-    "article": "添加新闻",
+    "addArticle": "添加新闻",
     "prod": "生产网站",
     "prev": "预览网站",
     "wagtail": "内容管理系统"
