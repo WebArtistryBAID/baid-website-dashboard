@@ -110,6 +110,7 @@ async function workOnAddArticle(build: Build, link: string) {
                 stream: false
             })
         })
+        console.log('+ DeepSeek responded with sanitized content.')
         const srj = await sanitizeResp.json()
         const sr = JSON.parse(srj.choices[0].message.content)
 
@@ -137,6 +138,7 @@ async function workOnAddArticle(build: Build, link: string) {
                 stream: false
             })
         })
+        console.log('+ DeepSeek responded with translated content.')
         const trj = await translateResp.json()
         const tr = JSON.parse(trj.choices[0].message.content)
 
