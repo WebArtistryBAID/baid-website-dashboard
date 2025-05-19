@@ -5,6 +5,7 @@
   "actions": {
     "title": "Actions",
     "build": "Build",
+    "article": "Add Article",
     "prod": "Production Website",
     "prev": "Preview Website",
     "wagtail": "Wagtail CMS"
@@ -26,6 +27,10 @@
     "activeProduction": "In Production",
     "activeBoth": "In Preview / Production",
     "error": "Error"
+  },
+  "article": {
+    "inputLabel": "WeChat Article Link",
+    "inputPlaceholder": "Enter the WeChat article link..."
   },
   "build": {
     "inputLabel": "Change description",

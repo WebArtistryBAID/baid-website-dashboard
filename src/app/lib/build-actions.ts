@@ -93,6 +93,12 @@ async function workOnBuild(build: Build): Promise<void> {
                     ALL_PROXY: process.env.PROXY
                 })
         }
+
+        if (!(await exists('../dashboard-artifacts/news'))) {
+            await fs.mkdir('../dashboard-artifacts/news')
+            await fs.writeFile('../dashboard-artifacts/news/db.json', '[]')
+        }
+
         await runCommand('npm', [ 'ci' ], '../dashboard-artifacts/repo', {
             NODE_ENV: process.env.NODE_ENV,
             ALL_PROXY: process.env.PROXY
@@ -102,6 +108,7 @@ async function workOnBuild(build: Build): Promise<void> {
             ALL_PROXY: process.env.PROXY,
             WAGTAIL_BASE: process.env.WAGTAIL_AUTH_PATH!
         })
+        await fs.cp('../dashboard-artifacts/news', '../dashboard-artifacts/repo/data/news', { recursive: true })
         await runCommand('./node_modules/.bin/vite', [ 'build' ], '../dashboard-artifacts/repo', {
             NODE_ENV: process.env.NODE_ENV,
             ALL_PROXY: process.env.PROXY

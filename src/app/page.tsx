@@ -7,6 +7,7 @@ import If from '@/app/lib/If'
 import BuildButton from '@/app/components/BuildButton'
 import DeployPreviewButton from '@/app/components/DeployPreviewButton'
 import DeployProductionButton from '@/app/components/DeployProductionButton'
+import AddArticleButton from '@/app/components/AddArticleButton'
 
 export default async function Home() {
     const { t } = await useTranslation('home')
@@ -18,11 +19,12 @@ export default async function Home() {
         <h1 className="mb-5 text-4xl font-bold">{t('welcome', { name: user })}</h1>
 
         <h2 className="text-xl mb-3">{t('actions.title')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
             <a href={process.env.PREVIEW_URL} className="btn-secondary">{t('actions.prev')}</a>
             <a href={process.env.PROD_URL} className="btn-secondary">{t('actions.prod')}</a>
             <a href={process.env.WAGTAIL_URL} className="btn-secondary">{t('actions.wagtail')}</a>
             <BuildButton/>
+            <AddArticleButton/>
         </div>
 
         <h2 className="text-xl mb-3">{t('builds.title')}</h2>

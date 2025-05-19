@@ -5,6 +5,7 @@
   "actions": {
     "title": "操作",
     "build": "构建",
+    "article": "添加新闻",
     "prod": "生产网站",
     "prev": "预览网站",
     "wagtail": "内容管理系统"
@@ -30,6 +31,10 @@
   "build": {
     "inputLabel": "更改构建说明",
     "inputPlaceholder": "描述您的更改..."
+  },
+  "article": {
+    "inputLabel": "微信公众号文章链接",
+    "inputPlaceholder": "请输入微信公众号文章链接..."
   },
   "deploy": {
     "previewMessage": "本次构建将可用于预览。",
