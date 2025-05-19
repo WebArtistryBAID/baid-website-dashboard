@@ -151,6 +151,17 @@ async function workOnAddArticle(build: Build, link: string) {
             }
         }
 
+        // Write metadata
+        await fs.mkdir(`../dashboard-artifacts/news/${build.id}/metadata.json`, JSON.stringify({
+            date,
+            title,
+            titleCN: titleChinese,
+            id: build.id,
+            cover,
+            excerpt: content.substring(0, 100) + '...',
+            excerptCN: contentChinese.substring(0, 100) + '...'
+        }))
+
         // Write content
         await fs.writeFile(path.join(`../dashboard-artifacts/news/${build.id}`, 'content.md'), content)
         await fs.writeFile(path.join(`../dashboard-artifacts/news/${build.id}`, 'content-zh.md'), contentChinese)
