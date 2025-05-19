@@ -2,7 +2,6 @@
 
 import { useTranslationClient } from '@/app/i18n/client'
 import { useState } from 'react'
-import { build } from '@/app/lib/build-actions'
 import { addArticle } from '@/app/lib/article-actions'
 
 export default function AddArticleButton() {
