@@ -28,6 +28,15 @@ function runCommand(
     })
 }
 
+async function exists(path: string): Promise<boolean> {
+    try {
+        await fs.access(path, fs.constants.F_OK)
+        return true
+    } catch {
+        return false
+    }
+}
+
 const prisma = new PrismaClient()
 let ongoingTask = false
 
@@ -57,9 +66,11 @@ export async function addArticle(link: string): Promise<Build | null> {
     return build
 }
 
+// CAVEAT: It is expected that there has already been an "initial build" before this.
 async function workOnAddArticle(build: Build, link: string) {
     ongoingTask = true
     try {
+        console.log(`+ Starting article download for ${build.id} from ${link}.`)
         // STEP 0: Download the article
         await fs.mkdir(`/tmp/article-build-${build.id}`)
         await runCommand('./blobs/downloader', [ link, `/tmp/article-build-${build.id}`, '--image=save' ], `/tmp/article-build-${build.id}`)
@@ -69,6 +80,7 @@ async function workOnAddArticle(build: Build, link: string) {
         await fs.rename(path.join(`/tmp/article-build-${build.id}`, files[0]), path.join(`/tmp/article-build-${build.id}`, 'article'))
 
 
+        console.log('+ Reading Markdown content.')
         // STEP 1: Read the Markdown content
         // Read the only Markdown file from /tmp/article-build-${build.id}/article.
         const articleFiles = await fs.readdir(`/tmp/article-build-${build.id}/article`)
@@ -80,6 +92,7 @@ async function workOnAddArticle(build: Build, link: string) {
 
         // Call DeepSeek to process the article
         // STEP 2: Sanitize content
+        console.log('+ Calling DeepSeek to sanitize article content.')
         const sanitizeResp = await fetch('https://api.deepseek.com/chat/completions', {
             headers: {
                 'Content-Type': 'application/json',
@@ -105,6 +118,7 @@ async function workOnAddArticle(build: Build, link: string) {
         const cover = sr.cover
 
         // STEP 3: Translate content
+        console.log('+ Calling DeepSeek to translate article content.')
         const translateResp = await fetch('https://api.deepseek.com/chat/completions', {
             headers: {
                 'Content-Type': 'application/json',
@@ -129,6 +143,7 @@ async function workOnAddArticle(build: Build, link: string) {
 
         // STEP 4: DEPLOY
         // Add to database
+        console.log('+ Adding to news database.')
         const newsDB = JSON.parse(await fs.readFile('../dashboard-artifacts/news/db.json', 'utf-8'))
         newsDB.push({
             date,
@@ -167,7 +182,56 @@ async function workOnAddArticle(build: Build, link: string) {
         await fs.writeFile(path.join(`../dashboard-artifacts/news/${build.id}`, 'content-zh.md'), contentChinese)
 
         // STEP 5: UPDATE BUILD
-        // TODO
+        console.log(`+ Starting build process for ${build.id}`)
+        console.log('+ It is expected that another build has been made already.')
+
+        await fs.cp('../dashboard-artifacts/news', '../dashboard-artifacts/repo/data/news', { recursive: true })
+        await runCommand('./node_modules/.bin/vite', [ 'build' ], '../dashboard-artifacts/repo', {
+            NODE_ENV: process.env.NODE_ENV,
+            ALL_PROXY: process.env.PROXY
+        })
+        if (!await exists('../dashboard-artifacts/repo/dist')) {
+            throw new Error('Build failed')
+        }
+
+        if (!await exists('../dashboard-artifacts/builds')) {
+            await fs.mkdir('../dashboard-artifacts/builds')
+        }
+
+        await fs.mkdir(`../dashboard-artifacts/builds/${build.id}`)
+        await fs.cp('../dashboard-artifacts/repo/dist/', `../dashboard-artifacts/builds/${build.id}/`, {
+            recursive: true,
+            force: true
+        })
+
+        await prisma.build.update({
+            where: {
+                id: build.id
+            },
+            data: {
+                status: BuildStatus.inactive
+            }
+        })
+
+        // Prune older builds, keep only the latest ten
+        const allEntries = await fs.readdir('../dashboard-artifacts/builds')
+        const buildDirs = allEntries
+            .filter(name => /^\d+$/.test(name))
+            .sort((a, b) => parseInt(b) - parseInt(a))
+        const toDelete = buildDirs.slice(10)
+        for (const dir of toDelete) {
+            await fs.rm(path.join('../dashboard-artifacts/builds', dir), { recursive: true, force: true })
+        }
+    } catch (e) {
+        console.error(`+ Build ${build.id} failed with ${e}`)
+        await prisma.build.update({
+            where: {
+                id: build.id
+            },
+            data: {
+                status: BuildStatus.error
+            }
+        })
     } finally {
         ongoingTask = false
     }
