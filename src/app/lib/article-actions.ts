@@ -158,8 +158,8 @@ async function workOnAddArticle(build: Build, link: string) {
             titleCN: titleChinese,
             id: build.id,
             cover,
-            excerpt: content.substring(0, 100) + '...',
-            excerptCN: contentChinese.substring(0, 100) + '...'
+            excerpt: content.substring(0, 70) + '...',
+            excerptCN: contentChinese.substring(0, 50) + '...'
         }))
 
         // Write content
