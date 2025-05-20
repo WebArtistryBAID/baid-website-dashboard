@@ -170,7 +170,7 @@ async function workOnAddArticle(build: Build, link: string) {
         const imageFiles = await fs.readdir(`/tmp/article-build-${build.id}/article`)
         for (const file of imageFiles) {
             if (file.endsWith('.jpeg') || file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.webp')) {
-                await fs.rename(path.join(`/tmp/article-build-${build.id}/article`, file), path.join(`../dashboard-artifacts/news/${build.id}/images`, file))
+                await fs.cp(path.join(`/tmp/article-build-${build.id}/article`, file), path.join(`../dashboard-artifacts/news/${build.id}/images`, file))
             }
         }
 
@@ -188,6 +188,9 @@ async function workOnAddArticle(build: Build, link: string) {
         // Write content
         await fs.writeFile(path.join(`../dashboard-artifacts/news/${build.id}`, 'content.md'), content)
         await fs.writeFile(path.join(`../dashboard-artifacts/news/${build.id}`, 'content-zh.md'), contentChinese)
+
+        // Clean up temporary directory
+        await fs.rm(`/tmp/article-build-${build.id}`, { recursive: true, force: true })
 
         // STEP 5: UPDATE BUILD
         console.log(`+ Starting build process for ${build.id}`)
