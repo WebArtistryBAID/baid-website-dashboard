@@ -169,13 +169,13 @@ async function workOnAddArticle(build: Build, link: string) {
         await fs.mkdir(`../dashboard-artifacts/news/${build.id}/images`)
         const imageFiles = await fs.readdir(`/tmp/article-build-${build.id}/article`)
         for (const file of imageFiles) {
-            if (file.endsWith('.jpg')) {
+            if (file.endsWith('.jpeg') || file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.webp')) {
                 await fs.rename(path.join(`/tmp/article-build-${build.id}/article`, file), path.join(`../dashboard-artifacts/news/${build.id}/images`, file))
             }
         }
 
         // Write metadata
-        await fs.mkdir(`../dashboard-artifacts/news/${build.id}/metadata.json`, JSON.stringify({
+        await fs.writeFile(`../dashboard-artifacts/news/${build.id}/metadata.json`, JSON.stringify({
             date,
             title,
             titleCN: titleChinese,
