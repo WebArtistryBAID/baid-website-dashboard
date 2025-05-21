@@ -90,6 +90,16 @@ async function workOnAddArticle(build: Build, link: string) {
         }
         const markdownContent = await fs.readFile(path.join(`/tmp/article-build-${build.id}/article`, markdownFile), 'utf-8')
 
+        // Remove decorative image files.
+        const toRemove = []
+        for (const file of articleFiles.filter(f => f.endsWith('.jpeg') || f.endsWith('.png') || f.endsWith('.jpg') || f.endsWith('.webp'))) {
+            const r = await fetch(`http://localhost:59192?image=/tmp/article-build-${build.id}/article/${file}`)
+            if ((await r.text()) === 'decorative') {
+                toRemove.push(file)
+            }
+            await fs.rm(path.join(`/tmp/article-build-${build.id}/article`, file), { force: true })
+        }
+
         // Call DeepSeek to process the article
         // STEP 2: Sanitize content
         console.log('+ Calling DeepSeek to sanitize article content.')
@@ -104,7 +114,8 @@ async function workOnAddArticle(build: Build, link: string) {
                 messages: [
                     {
                         role: 'user',
-                        content: SANITIZE_LITERAL.replace('{{PLACEHOLDER}}', build.id.toString()) + markdownContent
+                        content: SANITIZE_LITERAL.replace('{{PLACEHOLDER}}', build.id.toString()).replace('{{IMAGE_BLACKLIST}}', toRemove.toString())
+                            + markdownContent
                     }
                 ],
                 stream: false
@@ -309,6 +320,6 @@ EOT 经济竞赛 (指课程): Economics Olympiad Team
 内容:
 `
 
-const SANITIZE_LITERAL = `接下来你将对一段中文内容进行处理。这段内容以 Markdown 的形式提供给你，是由微信公众号内容转换而成的文字。因为微信公众号转换不准确，一些装饰文字元素可能也包含在文本里了。你需要删除这些装饰元素，只保留正文，并删除标题、公众号名称、日期等信息。请注意，图片也是正文的一部分，你应当保留图片的 Markdown 格式。你应该以 JSON 格式输出你的结果，包含字符串 "content"，表示 Markdown 内容；字符串 "title"，表示提取出的文章标题；和字符串 "date"，表示你从文本开头提取出的日期，以 yyyy-MM-dd 格式呈现。最后，还有字符串 "cover"，表示你从文本中提取出的**第一个图片**的链接。链接在 Markdown 图片格式中。最后一件事情: 你还应该将所有图片链接前都加上 https://cms.beijing.academy/news/{{PLACEHOLDER}}/images/ 的前缀。你输出的 cover 里也应当有这个前缀。适当地改善排版，将部分文字标为标题、加粗等，请在你输出的 content 中使用 Markdown 排版。
+const SANITIZE_LITERAL = `接下来你将对一段中文内容进行处理。这段内容以 Markdown 的形式提供给你，是由微信公众号内容转换而成的文字。因为微信公众号转换不准确，一些装饰文字元素可能也包含在文本里了。你需要删除这些装饰元素，只保留正文，并删除标题、公众号名称、日期等信息。请注意，图片也是正文的一部分，你应当保留图片的 Markdown 格式。你应该以 JSON 格式输出你的结果，包含字符串 "content"，表示 Markdown 内容；字符串 "title"，表示提取出的文章标题；和字符串 "date"，表示你从文本开头提取出的日期，以 yyyy-MM-dd 格式呈现。最后，还有字符串 "cover"，表示你从文本中提取出的**第一个图片**的链接。链接在 Markdown 图片格式中。最后一件事情: 你还应该将所有图片链接前都加上 https://cms.beijing.academy/news/{{PLACEHOLDER}}/images/ 的前缀。你输出的 cover 里也应当有这个前缀。适当地改善排版，将部分文字标为标题、加粗等，请在你输出的 content 中使用 Markdown 排版。还有一件事情: 删除所有 svg 图片，同时删除链接如下的图片: {{IMAGE_BLACKLIST}}。同时 cover 应该是**删除图片完成后**的第一个图片。删除完成后的第一个图片，请注意。
 内容:
 `
