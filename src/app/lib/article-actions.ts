@@ -249,6 +249,7 @@ async function workOnAddArticle(build: Build, link: string) {
 }
 
 const TRANSLATE_LITERAL = `现在我会给你一段中文内容，Markdown 格式，你需要翻译为英文。翻译时，注意文从字顺，不要有语病，大小写、标点符号正确。不要翻译图片。不要翻译 \\n (\\n 是换行的意思)。保留一切其他内容。输出一段 JSON。"content" (key String) 包含正文内容，但是必须删去大标题。"title" (key String) 包含单独翻译的标题。翻译中文人名时注意先姓后名，用拼音，如张丹萌为 Zhang Danmeng。翻译时注意专有名词。有些专有名词中文表述可能略有不同，请适当调整。这篇内容的题材是校园新闻报导，翻译时请符合一般格式。不要保留任何中文内容，只保留英文。不要保留任何中文内容，只保留英文。保留所有图片和其他 Markdown 结构。
+AGAIN, ABSOLUTELY DO NOT MIX CHINESE AND ENGLISH. DO NOT DO SOMETHING LIKE 导师 (instructor). THAT IS UNNECESSARY. ONLY INCLUDE ENGLISH CONTENT. I REPEAT, ENGLISH CONTENT ONLY.
 
 专有名词:
 北京中学: Beijing Academy
