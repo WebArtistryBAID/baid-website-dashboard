@@ -97,8 +97,8 @@ async function workOnAddArticle(build: Build, link: string) {
             const r = await fetch(`http://localhost:59192?image=/tmp/article-build-${build.id}/article/${file}`)
             if ((await r.text()) === 'decorative') {
                 toRemove.push(file)
+                await fs.rm(path.join(`/tmp/article-build-${build.id}/article`, file), { force: true })
             }
-            await fs.rm(path.join(`/tmp/article-build-${build.id}/article`, file), { force: true })
         }
         console.log('+ Removed decorative images: ' + toRemove.toString())
 
