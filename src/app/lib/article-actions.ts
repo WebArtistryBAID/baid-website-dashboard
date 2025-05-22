@@ -167,7 +167,7 @@ async function workOnAddArticle(build: Build, link: string) {
         const tr = JSON.parse(trStrippedContent)
 
         const title = tr.title
-        const content = tr.content
+        const content = tr.content + '\n\n*Disclaimer: This English translation is automatically generated and may contain inaccuracies. Please refer to the original Chinese version for the most accurate information.*'
         const excerpt = tr.excerpt
 
         // STEP 4: DEPLOY
