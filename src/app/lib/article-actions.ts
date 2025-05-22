@@ -93,11 +93,14 @@ async function workOnAddArticle(build: Build, link: string) {
         console.log('+ Calling image classifiers.')
         // Remove decorative image files.
         const toRemove = []
+        const toKeep = []
         for (const file of articleFiles.filter(f => f.endsWith('.jpeg') || f.endsWith('.png') || f.endsWith('.jpg') || f.endsWith('.webp'))) {
             const r = await fetch(`http://localhost:59192?image=/tmp/article-build-${build.id}/article/${file}`)
             if ((await r.text()) === 'decorative') {
                 toRemove.push(file)
                 await fs.rm(path.join(`/tmp/article-build-${build.id}/article`, file), { force: true })
+            } else {
+                toKeep.push(file)
             }
         }
         console.log('+ Removed decorative images: ' + toRemove.toString())
@@ -178,6 +181,7 @@ async function workOnAddArticle(build: Build, link: string) {
             id: build.id,
             cover,
             excerpt,
+            images: toKeep,
             excerptCN: excerptChinese
         })
         await fs.writeFile('../dashboard-artifacts/news/db.json', JSON.stringify(newsDB))
@@ -200,6 +204,7 @@ async function workOnAddArticle(build: Build, link: string) {
             id: build.id,
             cover,
             excerpt,
+            images: toKeep,
             excerptCN: excerptChinese
         }))
 
