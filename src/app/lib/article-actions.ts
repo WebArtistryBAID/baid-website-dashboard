@@ -177,8 +177,8 @@ async function workOnAddArticle(build: Build, link: string) {
             titleCN: titleChinese,
             id: build.id,
             cover,
-            excerpt: content.substring(0, 100) + '...',
-            excerptCN: contentChinese.substring(0, 100) + '...'
+            excerpt,
+            excerptCN: excerptChinese
         })
         await fs.writeFile('../dashboard-artifacts/news/db.json', JSON.stringify(newsDB))
 
