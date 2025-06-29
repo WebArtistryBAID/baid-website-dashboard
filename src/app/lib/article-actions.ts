@@ -137,6 +137,7 @@ async function workOnAddArticle(build: Build, link: string) {
         const titleChinese = sr.title
         const contentChinese = sr.content
         const excerptChinese = sr.excerpt
+        const keywordChinese = sr.keyword
         const date = sr.date
         const cover = sr.cover
 
@@ -169,6 +170,7 @@ async function workOnAddArticle(build: Build, link: string) {
         const title = tr.title
         const content = tr.content + '\n\n*Disclaimer: This English translation is automatically generated and may contain inaccuracies. Please refer to the original Chinese version for the most accurate information.*'
         const excerpt = tr.excerpt
+        const keyword = tr.keyword
 
         // STEP 4: DEPLOY
         // Add to database
@@ -205,7 +207,9 @@ async function workOnAddArticle(build: Build, link: string) {
             cover,
             excerpt,
             images: toKeep,
-            excerptCN: excerptChinese
+            excerptCN: excerptChinese,
+            keyword,
+            keywordCN: keywordChinese
         }))
 
         // Write content
