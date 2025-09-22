@@ -93,7 +93,7 @@ async function workOnBuild(build: Build): Promise<void> {
 
         if (!(await exists('../dashboard-artifacts/news'))) {
             await fs.mkdir('../dashboard-artifacts/news')
-            await fs.writeFile('../dashboard-artifacts/news/db.json', '[]')
+            await fs.writeFile('../dashboard-artifacts/news/pages.json', '0')
         }
 
         await runCommand('npm', [ 'ci' ], '../dashboard-artifacts/repo', {

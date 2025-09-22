@@ -169,8 +169,22 @@ async function workOnAddArticle(build: Build, link: string) {
 
         // STEP 4: DEPLOY
         // Add to database
+        // WE ARE USING A FILE-BASED DATABASE miraculously because this is legacy code.
         console.log('+ Adding to news database.')
-        const newsDB = JSON.parse(await fs.readFile('../dashboard-artifacts/news/db.json', 'utf-8'))
+        let pageToUse = parseInt(await fs.readFile('../dashboard-artifacts/news/pages.json', 'utf-8'))
+
+        if (pageToUse === 0) {
+            pageToUse = 1
+        } else {
+            const thatPage = JSON.parse(await fs.readFile(`../dashboard-artifacts/news/db-${pageToUse}.json`, 'utf-8')) as never[]
+            if (thatPage.length >= 10) {
+                pageToUse += 1
+                await fs.writeFile('../dashboard-artifacts/news/pages.json', pageToUse.toString())
+                await fs.writeFile(`../dashboard-artifacts/news/db-${pageToUse}.json`, '[]')
+            }
+        }
+
+        const newsDB = JSON.parse(await fs.readFile(`../dashboard-artifacts/news/db-${pageToUse}.json`, 'utf-8'))
         newsDB.push({
             date,
             title,
@@ -180,7 +194,7 @@ async function workOnAddArticle(build: Build, link: string) {
             excerpt: content.substring(0, 100) + '...',
             excerptCN: contentChinese.substring(0, 100) + '...'
         })
-        await fs.writeFile('../dashboard-artifacts/news/db.json', JSON.stringify(newsDB))
+        await fs.writeFile(`../dashboard-artifacts/news/db-${pageToUse}.json`, JSON.stringify(newsDB))
 
         // Move all image files
         await fs.mkdir(`../dashboard-artifacts/news/${build.id}`)
