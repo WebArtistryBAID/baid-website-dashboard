@@ -93,11 +93,14 @@ async function workOnAddArticle(build: Build, link: string) {
         console.log('+ Calling image classifiers.')
         // Remove decorative image files.
         const toRemove = []
+        const toKeep = []
         for (const file of articleFiles.filter(f => f.endsWith('.jpeg') || f.endsWith('.png') || f.endsWith('.jpg') || f.endsWith('.webp'))) {
             const r = await fetch(`http://localhost:59192?image=/tmp/article-build-${build.id}/article/${file}`)
             if ((await r.text()) === 'decorative') {
                 toRemove.push(file)
                 await fs.rm(path.join(`/tmp/article-build-${build.id}/article`, file), { force: true })
+            } else {
+                toKeep.push(file)
             }
         }
         console.log('+ Removed decorative images: ' + toRemove.toString())
@@ -134,6 +137,7 @@ async function workOnAddArticle(build: Build, link: string) {
         const titleChinese = sr.title
         const contentChinese = sr.content
         const excerptChinese = sr.excerpt
+        const keywordChinese = sr.keyword
         const date = sr.date
         const cover = sr.cover
 
@@ -164,8 +168,9 @@ async function workOnAddArticle(build: Build, link: string) {
         const tr = JSON.parse(trStrippedContent)
 
         const title = tr.title
-        const content = tr.content
+        const content = tr.content + '\n\n*Disclaimer: This English translation is automatically generated and may contain inaccuracies. Please refer to the original Chinese version for the most accurate information.*'
         const excerpt = tr.excerpt
+        const keyword = tr.keyword
 
         // STEP 4: DEPLOY
         // Add to database
@@ -191,8 +196,9 @@ async function workOnAddArticle(build: Build, link: string) {
             titleCN: titleChinese,
             id: build.id,
             cover,
-            excerpt: content.substring(0, 100) + '...',
-            excerptCN: contentChinese.substring(0, 100) + '...'
+            excerpt,
+            images: toKeep,
+            excerptCN: excerptChinese
         })
         await fs.writeFile(`../dashboard-artifacts/news/db-${pageToUse}.json`, JSON.stringify(newsDB))
 
@@ -214,7 +220,10 @@ async function workOnAddArticle(build: Build, link: string) {
             id: build.id,
             cover,
             excerpt,
-            excerptCN: excerptChinese
+            images: toKeep,
+            excerptCN: excerptChinese,
+            keyword,
+            keywordCN: keywordChinese
         }))
 
         // Write content
@@ -280,7 +289,7 @@ async function workOnAddArticle(build: Build, link: string) {
     }
 }
 
-const TRANSLATE_LITERAL = `现在我会给你一段中文内容，Markdown 格式，你需要翻译为英文。翻译时，注意文从字顺，不要有语病，大小写、标点符号正确。不要翻译图片。不要翻译 \\n (\\n 是换行的意思)。保留一切其他内容。输出一段 JSON。"content" (key String) 包含正文内容，但是必须删去大标题。"title" (key String) 包含单独翻译的标题。"excerpt" (key String) 包含一小段 20 词以内的内容概要，供读者参考。翻译中文人名时注意先姓后名，用拼音，如张丹萌为 Zhang Danmeng。翻译时注意专有名词。有些专有名词中文表述可能略有不同，请适当调整。这篇内容的题材是校园新闻报导，翻译时请符合一般格式。不要保留任何中文内容，只保留英文。不要保留任何中文内容，只保留英文。保留所有图片和其他 Markdown 结构。
+const TRANSLATE_LITERAL = `现在我会给你一段中文内容，Markdown 格式，你需要翻译为英文。翻译时，注意文从字顺，不要有语病，大小写、标点符号正确。不要翻译图片。不要翻译 \\n (\\n 是换行的意思)。保留一切其他内容。输出一段 JSON。"content" (key String) 包含正文内容，但是必须删去大标题。"title" (key String) 包含单独翻译的标题。"excerpt" (key String) 包含一小段 20 词以内的内容概要，供读者参考。"keyword" (key String) 包含一个总结文本的关键词，只有一个。翻译中文人名时注意先姓后名，用拼音，如张丹萌为 Zhang Danmeng。翻译时注意专有名词。有些专有名词中文表述可能略有不同，请适当调整。这篇内容的题材是校园新闻报导，翻译时请符合一般格式。不要保留任何中文内容，只保留英文。不要保留任何中文内容，只保留英文。保留所有图片和其他 Markdown 结构。
 AGAIN, ABSOLUTELY DO NOT MIX CHINESE AND ENGLISH. DO NOT DO SOMETHING LIKE 导师 (instructor). THAT IS UNNECESSARY. ONLY INCLUDE ENGLISH CONTENT. I REPEAT, ENGLISH CONTENT ONLY.
 
 专有名词:
@@ -341,6 +350,6 @@ EOT 经济竞赛 (指课程): Economics Olympiad Team
 内容:
 `
 
-const SANITIZE_LITERAL = `接下来你将对一段中文内容进行处理。这段内容以 Markdown 的形式提供给你，是由微信公众号内容转换而成的文字。因为微信公众号转换不准确，一些装饰文字元素可能也包含在文本里了。你需要删除这些装饰元素，只保留正文，并删除标题、公众号名称、日期等信息。请注意，图片也是正文的一部分，你应当保留图片的 Markdown 格式。你应该以 JSON 格式输出你的结果，包含字符串 "content"，表示 Markdown 内容；字符串 "title"，表示提取出的文章标题；和字符串 "date"，表示你从文本开头提取出的日期，以 yyyy-MM-dd 格式呈现。还有字符串 "cover"，表示你从文本中提取出的**第一个图片**的链接。链接在 Markdown 图片格式中。最后，还有字符串 “excerpt"，表示 50 字以内的文本概要，供读者参考。最后一件事情: 你还应该将所有图片链接前都加上 https://cms.beijing.academy/news/{{PLACEHOLDER}}/images/ 的前缀。你输出的 cover 里也应当有这个前缀。适当地改善排版，将部分文字标为标题、加粗等，请在你输出的 content 中使用 Markdown 排版。还有一件事情: 删除所有 svg 和 gif 图片，同时删除如下的图片: {{IMAGE_BLACKLIST}}。同时 cover 应该是**删除图片完成后**的第一个图片。删除完成后的第一个图片，请注意。
+const SANITIZE_LITERAL = `接下来你将对一段中文内容进行处理。这段内容以 Markdown 的形式提供给你，是由微信公众号内容转换而成的文字。因为微信公众号转换不准确，一些装饰文字元素可能也包含在文本里了。你需要删除这些装饰元素，只保留正文，并删除标题、公众号名称、日期等信息。请注意，图片也是正文的一部分，你应当保留图片的 Markdown 格式。你应该以 JSON 格式输出你的结果，包含字符串 "content"，表示 Markdown 内容；字符串 "title"，表示提取出的文章标题；和字符串 "date"，表示你从文本开头提取出的日期，以 yyyy-MM-dd 格式呈现。还有字符串 "cover"，表示你从文本中提取出的**第一个图片**的链接。链接在 Markdown 图片格式中。还有字符串 “excerpt"，表示 50 字以内的文本概要，供读者参考，以及字符串 "keyword"，表示一个总结全文的关键词，只有一个。最后一件事情: 你还应该将所有图片链接前都加上 https://cms.beijing.academy/news/{{PLACEHOLDER}}/images/ 的前缀。你输出的 cover 里也应当有这个前缀。适当地改善排版，将部分文字标为标题、加粗等，请在你输出的 content 中使用 Markdown 排版。还有一件事情: 删除所有 svg 和 gif 图片，同时删除如下的图片: {{IMAGE_BLACKLIST}}。同时 cover 应该是**删除图片完成后**的第一个图片。删除完成后的第一个图片，请注意。
 内容:
 `
